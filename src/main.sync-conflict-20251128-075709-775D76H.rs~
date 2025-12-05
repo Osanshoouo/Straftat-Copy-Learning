@@ -1,0 +1,97 @@
+use bevy::prelude::*;
+use bevy_xpbd::*;
+
+// Component Example
+#[derive(Component)]
+struct Position {
+    x: f32,
+    y: f32,
+}
+
+// System example
+fn print_position_system(query: Query<&Position>) {
+    for position in &query {
+        println!("position: {} {}", position.x, position.y);
+    }
+}
+
+// Entity example
+struct Entity(u64);
+
+#[derive(Component)]
+struct Person;
+
+#[derive(Component)]
+struct Name(String);
+
+// startup system (runs once at the start)
+fn add_people(mut commands: Commands) {
+    commands.spawn((Person, Name("Elaina Proctor".to_string())));
+    commands.spawn((Person, Name("Renzo Hume".to_string())));
+    commands.spawn((Person, Name("Zayna Nieves".to_string())));
+}
+
+fn greet_people(query: Query<&Name, With<Person>>) {
+    for name in &query {
+        println!("hello {}!", name.0);
+    }
+}
+
+fn update_people(mut query: Query<&mut Name, With<Person>>) {
+    for mut name in &mut query {
+        if name.0 == "Elaina Proctor" {
+            name.0 = "Elaina Hume".to_string();
+            break;
+        }
+    }
+}
+
+fn hello_world() {
+    println!("hello world!");
+}
+
+fn startup(
+    mut commands: Commands,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+    
+) {
+    let sphere = meshes.add(Mesh::from(shape::Icosphere {
+	radius: 0.5,
+	subdivisions: 4,
+    }));
+    
+    let white = materials.add(StandardMaterial {
+	base_color: Color::WHITE,
+	unlit: true,
+	..Default::default()
+    });
+
+    commands
+	.spawn_bundle(PbrBundler {
+	    mesh: sphere.clone(),
+	    material: white.clone(),
+	    ..Default::default()
+	})
+	.insert(Pos(Vec2::ZERO));
+
+    commands
+	.spawn_bundle(OrthographicCameraBundle {
+	    transform: Transform::from_translation(Vec3::new(0.,0.,100.)),
+	    orthographic_projection: bevy::render::camera::OrthographicProjection {
+		scale: 0.01,
+		..Default::default()
+	    }
+	    ..OrthographicCameraBundle::new_3d()
+	
+	
+}
+
+fn main() {
+    App::new()
+	.insert_resource(ClearColor(Color::BLACK))
+	.insert_resource(Msaa { samples: 4})
+	.add_plugins(Default Plugins)
+	.add_startup_system(startup)
+	.run();
+}
