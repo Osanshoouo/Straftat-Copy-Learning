@@ -1,0 +1,13 @@
+#![allow(unused)]
+use bevy::{app::App, prelude::*};
+
+fn rotation(time: Res<Time>, mut cubes: Query<(&mut Transform, &Object)>) {
+    for (mut transform, cube) in &mut cubes {
+        transform.translation.x = 0.0;
+        transform.translation.y = 2.0;
+        transform.translation.z = 0.0;
+        transform.rotate_y(0.5 * TAU * time.delta_secs());
+        transform.rotate_x(0.5 * TAU * time.delta_secs());
+        transform.rotate_z(0.5 * TAU * time.delta_secs());
+    }
+}
